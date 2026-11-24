@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Brief · Interactive demo edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f2e7;--paper2:#efe7d6;--desk:#e6dece;--ink:#1b1b1b;--muted:#6b6256;--rule:#cfc4ae;--ox:#7d1d1d;--up:#1e6b3a;--down:#a11d1d;
+--display:"Playfair Display",Georgia,serif;--body:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--desk);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* Demo chrome */
+.bar{position:sticky;top:0;z-index:30;background:var(--ink);color:var(--paper);border-bottom:3px double var(--paper)}
+.bar-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bar .brand{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:-.01em;text-decoration:none;color:var(--paper)}
+.bar .brand small{font-family:var(--body);font-weight:400;font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-left:10px}
+.bar .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toggle{display:inline-flex;gap:8px;align-items:center;font-size:14px;background:none;border:1.5px solid rgba(247,242,231,.5);padding:6px 12px;border-radius:999px;color:var(--paper)}
+.toggle .dot{width:30px;height:16px;border-radius:9px;background:rgba(247,242,231,.25);position:relative;transition:.2s}
+.toggle .dot::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--paper);transition:.2s}
+.toggle[aria-pressed="true"] .dot{background:#c9a96a}
+.toggle[aria-pressed="true"] .dot::after{left:16px}
+.backlink{color:var(--paper);font-size:14px;opacity:.85}
+
+.layout{max-width:1180px;margin:0 auto;padding:22px 18px 80px;display:grid;grid-template-columns:minmax(0,680px) minmax(0,1fr);gap:28px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+
+.guide{position:sticky;top:76px;background:#fffaf0;border:1px solid var(--rule);border-top:3px solid var(--ink);padding:18px 20px}
+@media(max-width:980px){.guide{position:static;order:-1}}
+.guide h2{font-family:var(--display);font-size:22px;margin:0 0 6px}
+.guide p{margin:0 0 10px;font-size:15.5px}
+.guide ul{margin:6px 0 12px;padding-left:18px;font-size:15px}
+.guide li{margin:3px 0}
+.guide .label{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--ox);text-transform:uppercase}
+.guide .honest{font-size:13.5px;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px;margin-top:10px}
+.prefs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.pref{font-size:13px;border:1px solid var(--rule);background:var(--paper);padding:2px 9px;border-radius:999px;transition:.3s}
+.pref.boost{border-color:var(--up);color:var(--up);font-weight:700}
+.pref.cut{border-color:var(--down);color:var(--down);text-decoration:line-through}
+
+/* The edition */
+.edition{background:var(--paper);border:1px solid #d6ccb8;box-shadow:0 18px 40px -28px rgba(60,40,10,.45);padding:22px 28px 30px}
+@media(max-width:560px){.edition{padding:16px 16px 24px}}
+.ears{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.mast{font-family:var(--display);font-weight:900;font-size:58px;line-height:1;text-align:center;letter-spacing:-.02em;margin:10px 0 2px}
+.motto{text-align:center;font-style:italic;color:var(--muted);font-size:14px;margin:0 0 10px}
+.dateline{border-top:3px double var(--ink);border-bottom:1px solid var(--ink);padding:7px 0;text-align:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.brief30{background:var(--paper2);border-left:3px solid var(--ox);padding:14px 18px;margin:20px 0 6px}
+.kick{font-size:12px;letter-spacing:.17em;text-transform:uppercase;font-weight:700;color:var(--ox)}
+.brief30 ul{margin:6px 0 0;padding:0;list-style:none}
+.brief30 li{padding:3px 0 3px 20px;position:relative;font-size:15.5px}
+.brief30 li::before{content:"";position:absolute;left:2px;top:12px;width:7px;height:7px;background:var(--ink)}
+.sec{padding:22px 0 8px;border-bottom:1px solid var(--ink);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec h3{margin:0;font-size:13px;letter-spacing:.17em;text-transform:uppercase}
+.sec .sub{font-size:13px;color:var(--muted);font-style:italic}
+table.nums{width:100%;border-collapse:collapse;font-size:15px}
+table.nums td{padding:7px 0;border-bottom:1px solid var(--rule)}
+table.nums td.v{text-align:right;white-space:nowrap}
+table.nums td.c{text-align:right;width:92px;white-space:nowrap;font-weight:700;font-size:14px}
+table.nums tr.grp td{color:var(--ox);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding-top:14px;border-bottom:0}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--muted)}
+.numsrc{font-size:12px;color:var(--muted);background:none;border:0;padding:0;text-decoration:underline dotted;text-underline-offset:3px}
+.note{font-size:12.5px;font-style:italic;color:var(--muted);margin:6px 0 0}
+
+.story{padding:14px 0;border-bottom:1px solid var(--rule)}
+.story:last-child{border-bottom:0}
+.story .k{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ox);font-weight:700}
+.story a.h{text-decoration:none}
+.story a.h:hover{text-decoration:underline;text-decoration-color:var(--ox)}
+.top a.h{font-family:var(--body);font-weight:700;font-size:22px;line-height:1.25;display:block;margin:3px 0 6px}
+.line a.h{font-size:16.5px;line-height:1.4}
+.ext{font-size:11px;color:var(--muted);margin-left:4px}
+.sum{font-size:16px;margin:0 0 6px}
+.why{font-style:italic;font-size:15px;margin:6px 0 0}
+.why b{font-style:normal;color:var(--ox)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:7px;font-size:12.5px;color:var(--muted)}
+.chipbtn{background:none;border:1px solid var(--rule);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--muted)}
+.chipbtn:hover{border-color:var(--ink);color:var(--ink)}
+.chipbtn.ok{border-color:#9cc3a6;color:var(--up)}
+.chipbtn.behind{border-color:var(--ox);color:var(--ox);font-weight:700}
+.vote{background:none;border:0;padding:0 2px;font-size:15px;filter:grayscale(.2)}
+.vote.on{transform:scale(1.25)}
+.outlets{display:none;margin:8px 0 0;padding:8px 12px;background:var(--paper2);font-size:13.5px}
+.outlets.open{display:block}
+.outlets a{color:var(--ox)}
+.bubble{background:#fffaf0;border:1px dashed var(--ox);padding:4px 14px;margin-top:10px}
+.foot{border-top:3px double var(--ink);margin-top:26px;padding-top:14px;text-align:center;font-size:14px}
+.foot button{background:none;border:0;padding:0;text-decoration:underline;color:var(--ox);font-weight:700}
+.foot .u{color:var(--muted);font-weight:400}
+.howmade{font-size:12px;color:var(--muted);margin:10px auto 0;max-width:520px;text-align:center}
+.weather{font-size:13px;color:var(--muted);font-style:italic}
+
+/* Explain markers */
+.mk{display:none;width:21px;height:21px;border-radius:50%;background:#c9a96a;color:var(--ink);font:700 12px/21px var(--body);text-align:center;border:0;padding:0;margin-left:6px;vertical-align:middle;box-shadow:0 0 0 3px rgba(201,169,106,.3);animation:pulse 2.4s infinite}
+body.explain .mk{display:inline-block}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(201,169,106,.35)}50%{box-shadow:0 0 0 7px rgba(201,169,106,.08)}}
+
+/* Popover / sheet / drawer / toast / modal */
+.pop{position:absolute;z-index:50;max-width:360px;background:#fffdf8;border:1px solid var(--ink);box-shadow:0 18px 40px -16px rgba(0,0,0,.35);padding:14px 16px;font-size:14.5px;display:none}
+.pop.show{display:block}
+.pop h4{font-family:var(--display);font-size:18px;margin:0 0 6px}
+.pop p{margin:0 0 8px}
+.pop .x{position:absolute;top:6px;right:8px;background:none;border:0;font-size:18px;color:var(--muted)}
+.bars{margin:8px 0 4px}
+.bars div{display:grid;grid-template-columns:96px 1fr 38px;gap:8px;align-items:center;font-size:12.5px;margin:3px 0}
+.bars i{display:block;height:8px;background:var(--paper2);position:relative}
+.bars i b{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+.bars i b.neg{background:var(--down)}
+.claims{margin:6px 0 0;padding:0;list-style:none}
+.claims li{padding:6px 0;border-top:1px solid var(--rule);font-size:13.5px}
+.claims .v{font-family:var(--mono);font-size:11px;letter-spacing:.05em}
+.claims .ok{color:var(--up)} .claims .no{color:var(--down)}
+.claims s{color:var(--muted)}
+@media(max-width:640px){.pop{position:fixed;left:8px!important;right:8px;bottom:8px;top:auto!important;max-width:none;max-height:70vh;overflow:auto}}
+
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--paper);z-index:60;box-shadow:-20px 0 50px -20px rgba(0,0,0,.4);transform:translateX(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);overflow:auto;border-left:3px double var(--ink)}
+.drawer.open{transform:none}
+.drawer .hd{position:sticky;top:0;background:var(--ink);color:var(--paper);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.drawer .hd h3{margin:0;font-family:var(--display);font-size:20px}
+.drawer .hd button{background:none;border:0;color:var(--paper);font-size:22px}
+.drawer .bd{padding:16px 20px 40px}
+.step{position:relative;padding:0 0 18px 34px;border-left:2px solid var(--rule);margin-left:12px}
+.step:last-child{border-left-color:transparent}
+.step .n{position:absolute;left:-13px;top:0;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);font:700 12px/24px var(--body);text-align:center}
+.step h5{margin:0 0 4px;font-size:15.5px}
+.step p{margin:0 0 6px;font-size:14px;color:#3a352e}
+.step .mono{font-family:var(--mono);font-size:12px;background:#fffaf0;border:1px solid var(--rule);padding:8px 10px;white-space:pre-wrap;color:var(--ink)}
+.scrim{position:fixed;inset:0;background:rgba(27,27,27,.35);z-index:55;display:none}
+.scrim.show{display:block}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(140%);background:var(--ink);color:var(--paper);padding:12px 18px;max-width:min(560px,92vw);font-size:14.5px;z-index:70;transition:transform .3s;border-left:4px solid #c9a96a}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.modal{position:fixed;inset:0;z-index:65;display:none;place-items:center;padding:16px}
+.modal.show{display:grid}
+.modal .card{background:var(--paper);max-width:760px;width:100%;max-height:88vh;overflow:auto;border:1px solid var(--ink);padding:18px 20px}
+.modal img{width:100%;border:1px solid var(--rule)}
+.modal h3{font-family:var(--display);margin:0 0 6px}
+.nlbox{background:var(--paper2);padding:10px 12px;margin:10px 0;font-style:italic}
+</style>
+</head>
+<body class="explain">
+
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="index.html">The Brief<small>Interactive demo</small></a>
+    <div class="tools">
+      <button class="toggle" id="explainBtn" aria-pressed="true"><span class="dot"></span>Explain mode</button>
+      <a class="backlink" href="index.html">← Project page</a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <main class="edition" id="edition" aria-label="Demo edition"></main>
+
+  <aside class="guide" aria-label="How to use this demo">
+    <p class="label">How to read this demo</p>
+    <h2>This is the email a reader gets.</h2>
+    <p>Everything here is clickable. The gold dots explain each feature; switch them off with <b>Explain mode</b> to see the clean email.</p>
+    <ul>
+      <li><b>Headlines</b> open the real article.</li>
+      <li><b>"3 outlets"</b> shows who else reported it.</li>
+      <li><b>"Why this?"</b> shows the ranker's six signals.</li>
+      <li><b>"Fact-checked"</b> shows each sentence's sources.</li>
+      <li><b>👍 / 👎</b> teach the ranking, as shown below.</li>
+      <li><b>"Behind this story"</b> walks through the pipeline.</li>
+    </ul>
+    <p class="label">This reader's interests</p>
+    <div class="prefs" id="prefs"></div>
+    <p style="font-size:13.5px;color:var(--muted);margin:4px 0 0">Vote on a story and watch these update. In the real product, votes reshape tomorrow's edition.</p>
+    <p class="honest"><b>What's real:</b> every headline links to real reporting from Nov 16–19, 2026, and the market numbers are the published closes they cite. <b>What's a demo:</b> this page was assembled by hand to show the product. The ranking scores are illustrative, and votes here don't go anywhere.</p>
+  </aside>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Behind this story"><div class="hd"><h3>Behind this story</h3><button id="drawerClose" aria-label="Close">×</button></div><div class="bd" id="drawerBody"></div></aside>
+<div class="toast" id="toast" role="status"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="card" id="modalCard"></div></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Data: real reporting, Nov 16–19, 2026. Numbers are published closes, labelled with their source.
+// ---------------------------------------------------------------------------
+const S = {
+  kotak18: { name: "Kotak Neo", url: "https://www.kotakneo.com/news/market-news/market-wrap-18-november-2026-profit-booking-and-a-drag-in-metal-stocks-pull-benchmarks-down/" },
+  dsij18: { name: "DSIJ", url: "https://insights.dsij.in/dsijarticledetail/closing-bell-nifty-snap-2-day-rally-sensex-drops-500-points-nifty-metal-sinks-246" },
+  ml18: { name: "Moneylife", url: "https://www.moneylife.in/article/sensex-nifty-snap-twoday-winning-streak-as-profit-booking-triggers-selloff-wednesday-closing-report/82215.html" },
+  dsij19: { name: "DSIJ", url: "https://insights.dsij.in/gu/dsijarticledetail/closing-bell-nifty-50-surges-286-points-above-25500-sensex-jumps-990-points-auto-stocks-rally-440-60521" },
+  ms18: { name: "Morningstar / Dow Jones", url: "https://www.morningstar.com/news/dow-jones/202611188038/sp-500-falls-023-to-732363-data-talk" },
+  angel18: { name: "Angel One", url: "https://www.angelone.in/news/commodities/dubai-gold-rate-today-24-carat-gold-fall-to-aed-457-00-per-gram-on-november-18-2026" },
+  drop19: { name: "Drop Site News", url: "https://www.dropsitenews.com/p/iran-war-oil-ansarallah-saudi-riyadh-icj-myanmar-rohingya" },
+  neuron18: { name: "The Neuron", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-wednesday-november-18-2026/" },
+  aiweekly16: { name: "AI Weekly (via TechCrunch)", url: "https://aiweekly.co/ai-news-today/edition/2026-11-16" },
+  gb18: { name: "Gulf Business", url: "https://gulfbusiness.com/en/2026/uae/dubai-eid-al-etihad-holiday-school-break-dates-announced/" },
+  gb13: { name: "Gulf Business", url: "https://gulfbusiness.com/en/2026/news/eid-al-etihad-55-uae-announces-2-day-holiday-for-private-sector/" },
+  gbSummit: { name: "Gulf Business", url: "https://gulfbusiness.com/en/2026/uae/gulf-business-readies-for-landmark-uae-india-summit/" },
+  bsMum: { name: "Business Standard", url: "https://www.business-standard.com/topic/mumbai" },
+  toMum: { name: "Time Out Mumbai", url: "https://www.timeout.com/mumbai/sitemaps/2026/11" },
+  ian19: { name: "ITV News (via ianVisits)", url: "https://www.ianvisits.co.uk/articles/the-london-buzz-19th-nov-2026-94260/" },
+  ian18: { name: "ITV / BBC News (via ianVisits)", url: "https://ianvisits.co.uk/articles/the-london-buzz-18th-nov-2026-94219" },
+  reuters: { name: "Reuters (via Forth)", url: "https://www.forth.news/bots/reuters" },
+};
+
+const NUMBERS = [
+  { grp: "Markets" },
+  { label: "Sensex", value: "82,031.81", chg: -0.61, src: "kotak18", note: "Close, Nov 18" },
+  { label: "Nifty 50", value: "25,227.95", chg: -0.63, src: "dsij19", note: "Close, Nov 18. Change computed from the Nov 17 close of 25,387.40 (DSIJ)" },
+  { label: "S&P 500", value: "7,323.63", chg: -0.23, src: "ms18", note: "Nov 18" },
+  { grp: "Currencies" },
+  { label: "1 AED → INR", value: "25.44 INR", chg: null, src: "angel18", note: "9:16 AM IST, Nov 18" },
+  { grp: "Gold · Dubai retail rate" },
+  { label: "Gold 24K, per gram", value: "AED 457.00", chg: -1.56, src: "angel18", note: "Nov 18; previous close AED 464.25" },
+  { label: "Gold 22K, per gram", value: "AED 423.25", chg: -1.51, src: "angel18", note: "Nov 18; previous close AED 429.75" },
+];
+
+const BRIEF30 = [
+  "Indian stocks slipped on November 18 as investors booked profits; the Sensex closed at 82,031.81.",
+  "The IEA says the Iran war has caused the largest-ever disruption to global oil and gas trade.",
+  "OpenAI released two new models, GPT-6.2 Astra and Sol, aimed at professional work.",
+];
+
+const F = (rel, imp, fresh, aff, nov, dis) => ({ relevance: rel, importance: imp, freshness: fresh, affinity: aff, novelty: nov, dislike: dis });
+
+const TOP = [
+  { id: "t1", section: "Markets", pref: "Indian markets", headline: "Sensex, Nifty snap two-day winning streak as profit booking hits metal stocks",
+    url: S.dsij18.url, source: "DSIJ", outlets: ["dsij18", "kotak18", "ml18"],
+    sentences: [
+      { text: "Indian benchmarks fell on November 18 as investors booked profits after a sharp November rally, with metal stocks leading the decline.", cites: ["dsij18", "kotak18"], ok: true },
+      { text: "The Sensex lost about 500 points to close at 82,031.81.", cites: ["kotak18"], ok: true },
+      { text: "Analysts expect the slide to deepen next week.", cites: ["ml18"], ok: false, reason: "Not stated in any cited source; the verifier removed it before sending." },
+    ],
+    why: "You track the Sensex and Nifty, and both had closed at their highest levels in nearly nine months the day before.",
+    whyCite: "dsij18", features: F(.92, .58, .81, .74, 1, 0), explain: "Because you follow Indian markets · reported by 3 outlets", behind: true },
+  { id: "t2", section: "World", pref: "World", headline: "Iran war causes largest-ever disruption to global oil and gas trade, IEA says",
+    url: S.drop19.url, source: "Drop Site News", outlets: ["drop19"],
+    sentences: [
+      { text: "The International Energy Agency says the Iran war has caused the largest-ever disruption to global oil and gas trade.", cites: ["drop19"], ok: true },
+      { text: "Iran says five oil tankers struck naval mines and caught fire in Hormuz.", cites: ["drop19"], ok: true },
+    ],
+    why: "Energy shocks move the markets and the gold price you follow.", features: F(.71, .66, .88, .52, 1, 0), explain: "Close to your interest in World · breaking in the last day" },
+  { id: "t3", section: "Tech & AI", pref: "Tech & AI", headline: "OpenAI releases GPT-6.2 Astra and Sol",
+    url: S.neuron18.url, source: "The Neuron", outlets: ["neuron18"],
+    sentences: [{ text: "OpenAI released two models, GPT-6.2 Astra and Sol, aimed at improving professional work while reducing the computing cost of complex tasks.", cites: ["neuron18"], ok: true }],
+    why: "You follow Tech & AI, and this is the week's largest model release.", features: F(.89, .40, .84, .68, 1, 0), explain: "Because you follow Tech & AI · from the last day" },
+];
+
+const SECTIONS = [
+  { title: "Politics", pref: "Politics", items: [
+    { id: "p1", headline: "US Supreme Court rejects Trump appeal defending diversity-related grant cuts", url: S.reuters.url, source: "Reuters", outlets: ["reuters"], features: F(.66, .52, .70, .55, 1, 0), explain: "Because you follow World politics · reported widely" },
+    { id: "p2", headline: "Iranian leaders fret over public mood as gas shortages add to war ills", url: S.reuters.url, source: "Reuters", outlets: ["reuters"], features: F(.70, .48, .66, .55, 1, 0), explain: "Close to your interest in World politics" },
+  ]},
+  { title: "Dubai", pref: "Dubai", weather: true, items: [
+    { id: "d1", headline: "Eid Al Etihad: Dubai schools break from December 2 to 4", url: S.gb18.url, source: "Gulf Business", outlets: ["gb18", "gb13"], features: F(.82, .45, .80, .61, 1, 0), explain: "Because you follow Dubai · reported by 2 outlets" },
+    { id: "d2", headline: "Dubai impounds nearly 36,000 scooters and bikes over reckless riding", url: S.gb18.url, source: "Gulf Business", outlets: ["gb18"], features: F(.80, .30, .78, .61, 1, 0), explain: "Because you follow Dubai" },
+    { id: "d3", headline: "Business leaders to meet in Dubai on November 27 for a UAE–India summit", url: S.gbSummit.url, source: "Gulf Business", outlets: ["gbSummit"], features: F(.85, .28, .55, .61, 1, 0), explain: "Because you follow Dubai and Indian markets" },
+  ]},
+  { title: "Mumbai", pref: "Mumbai", weather: true, items: [
+    { id: "m1", headline: "Traffic curbs in south Mumbai for Prince William's visit and the Earthshot Prize summit", url: S.bsMum.url, source: "Business Standard", outlets: ["bsMum", "toMum"], features: F(.83, .46, .64, .58, 1, 0), explain: "Because you follow Mumbai · reported by 2 outlets" },
+    { id: "m2", headline: "ART MUMBAI 2026 returns with 94 galleries and an expanded programme", url: S.toMum.url, source: "Time Out Mumbai", outlets: ["toMum"], features: F(.79, .22, .50, .58, 1, 0), explain: "Because you follow Mumbai" },
+  ]},
+  { title: "London", pref: "London", weather: true, items: [
+    { id: "l1", headline: "James Cleverly selected as the Conservative candidate for London mayor", url: S.ian19.url, source: "ITV News", outlets: ["ian19"], features: F(.84, .44, .86, .50, 1, 0), explain: "Because you follow London · from the last day" },
+    { id: "l2", headline: "London's busiest road bridge may have to close to buses and fire engines without repairs", url: S.ian18.url, source: "ITV News", outlets: ["ian18"], features: F(.81, .36, .72, .50, 1, 0), explain: "Because you follow London" },
+  ]},
+  { title: "Tech & AI", pref: "Tech & AI", items: [
+    { id: "a1", headline: "Apple restores iCloud and App Store after an internal update disrupted services", url: S.gb18.url, source: "Gulf Business", outlets: ["gb18"], features: F(.74, .50, .76, .68, 1, 0), explain: "Because you follow Tech & AI" },
+    { id: "a2", headline: "New Delhi chip startup Bharat Semi raises $24 million for AI image sensors", url: S.aiweekly16.url, source: "TechCrunch", outlets: ["aiweekly16"], features: F(.86, .26, .58, .68, 1, 0), explain: "Because you follow Tech & AI and Indian markets" },
+  ]},
+];
+
+const BUBBLE = { id: "b1", headline: "Pope Leo ends a 12-day South America tour that drew millions", url: S.reuters.url, source: "Reuters", outlets: ["reuters"], features: F(.12, .62, .55, .5, 1, 0),
+  explain: "Outside your usual interests: chosen on purpose, once a day" };
+
+const PREFS = ["Indian markets", "US markets", "Gold (AED)", "AED → INR", "Politics", "World", "Dubai", "Mumbai", "London", "Tech & AI"];
+
+const EXPLAIN = {
+  brief: ["Today in 30 seconds", "Three bullets written by Claude for this reader, using only the stories and numbers below. A deterministic check removes any bullet containing a number that doesn't appear in the inputs."],
+  numbers: ["The Numbers: no AI involved", "Indices, currencies and gold come straight from data sources and are printed as-is. They never pass through a language model, so they can't be paraphrased or invented. Tap a source to see where each number came from."],
+  event: ["Events, not articles", "Articles about the same story are grouped into one event using text embeddings. The number of distinct outlets is the importance signal, so this story appears once, with every outlet listed."],
+  why: ["Why it matters to you", "One line written per reader that ties the story to something in their profile. It's held to the same rule as the summary: no facts beyond the sources."],
+  factcheck: ["Fact-checked before sending", "Claude writes from a numbered source pack and cites each sentence. A numbers check and a second model act as verifiers; any sentence they can't back up is removed. Tap to see the receipts."],
+  whythis: ["Why am I seeing this?", "Generated from the ranker's own top signals, not written by the AI, so it's always true. Tap to see all six scores."],
+  votes: ["👍 / 👎", "Each vote nudges this reader's interest vectors and a per-section bandit that decides how many stories each section gets. In this demo, the interest chips on the right react."],
+  bubble: ["Outside your bubble", "One important story a day, deliberately far from the reader's interests. It counters filter bubbles and lets the system explore."],
+  cities: ["Your cities", "Up to three cities per reader, each with local news and the day's weather."],
+  footer: ["Every email explains itself", "Readers can change their interests in plain English, and the footer says how many sentences passed fact-checking."],
+};
+
+// ---------------------------------------------------------------------------
+const $ = (s, el) => (el || document).querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let mkn = 0;
+const mk = key => `<button class="mk" data-explain="${key}" aria-label="Explain: ${esc(EXPLAIN[key][0])}">${++mkn}</button>`;
+const fmtChg = c => c == null ? '<span class="flat">—</span>' : `<span class="${c > 0 ? "up" : c < 0 ? "down" : "flat"}">${c > 0 ? "▲ +" : c < 0 ? "▼ " : ""}${c.toFixed(2)}%</span>`;
+const ALL = {};
+
+function storyMeta(it, opts = {}) {
+  const n = it.outlets.length;
+  const checked = it.sentences ? `<button class="chipbtn ok" data-fc="${it.id}">✓ Fact-checked ${it.sentences.filter(s => s.ok).length}/${it.sentences.length}</button>` : "";
+  return `<div class="meta">
+      <span>${esc(it.source)}</span>
+      ${n > 1 ? `<button class="chipbtn" data-outlets="${it.id}">${n} outlets ▾</button>` : ""}
+      <button class="chipbtn" data-why="${it.id}">Why this?</button>
+      ${checked}
+      ${opts.behind ? `<button class="chipbtn behind" data-behind="${it.id}">Behind this story →</button>` : ""}
+      <span><button class="vote" data-vote="up" data-id="${it.id}" aria-label="More like this">👍</button><button class="vote" data-vote="down" data-id="${it.id}" aria-label="Less like this">👎</button></span>
+      ${opts.marks || ""}
+    </div>
+    <div class="outlets" id="out-${it.id}">Also reported by: ${it.outlets.map(k => `<a href="${S[k].url}" target="_blank" rel="noopener">${esc(S[k].name)}</a>`).join(" · ")}</div>
+    <div style="font-size:11.5px;font-style:italic;color:var(--muted);margin-top:3px">${esc(it.explain)}</div>`;
+}
+
+function render() {
+  const ed = $("#edition");
+  let h = `<div class="ears"><span>Vol. II · Demo</span><span>Edition for you</span></div>
+    <div class="mast">The Brief</div><p class="motto">Your morning, on one page.</p>
+    <div class="dateline">Thursday, November 19, 2026 · Dubai · Mumbai · London</div>`;
+  h += `<section class="brief30"><span class="kick">Today in 30 seconds</span>${mk("brief")}<ul>${BRIEF30.map(b => `<li>${esc(b)}</li>`).join("")}</ul></section>`;
+  h += `<div class="sec"><h3>The Numbers</h3><span class="sub">straight from the data, no AI · as of Nov 18</span>${mk("numbers")}</div><table class="nums">`;
+  NUMBERS.forEach(r => {
+    if (r.grp) { h += `<tr class="grp"><td colspan="3">${esc(r.grp)}</td></tr>`; return; }
+    h += `<tr><td>${esc(r.label)} <button class="numsrc" data-src="${r.src}" data-note="${esc(r.note)}">source</button></td><td class="v">${esc(r.value)}</td><td class="c">${fmtChg(r.chg)}</td></tr>`;
+  });
+  h += `</table><p class="note">Gold shows the Dubai retail rate per gram. Change is versus the previous published close.</p>`;
+  h += `<div class="sec"><h3>Top Stories</h3></div>`;
+  TOP.forEach((t, i) => {
+    ALL[t.id] = t;
+    const ok = t.sentences.filter(s => s.ok).map(s => s.text).join(" ");
+    h += `<article class="story top"><div class="k">${esc(t.section)}${i === 0 ? mk("event") : ""}</div>
+      <a class="h" href="${t.url}" target="_blank" rel="noopener">${esc(t.headline)}<span class="ext">↗</span></a>
+      <p class="sum">${esc(ok)}${i === 0 ? mk("factcheck") : ""}</p>
+      <p class="why"><b>Why it matters to you:</b> ${esc(t.why)}${i === 0 ? mk("why") : ""}</p>
+      ${storyMeta(t, { behind: t.behind, marks: i === 0 ? mk("whythis") + mk("votes") : "" })}</article>`;
+  });
+  SECTIONS.forEach((sec, si) => {
+    const wx = sec.weather ? `<span class="weather">Weather appears here in the live email</span>` : "";
+    h += `<div class="sec"><h3>${esc(sec.title)}</h3>${wx}${si === 1 ? mk("cities") : ""}</div>`;
+    sec.items.forEach(it => {
+      it.section = sec.title; it.pref = sec.pref; ALL[it.id] = it;
+      h += `<article class="story line"><a class="h" href="${it.url}" target="_blank" rel="noopener">${esc(it.headline)}<span class="ext">↗</span></a>${storyMeta(it)}</article>`;
+    });
+  });
+  ALL[BUBBLE.id] = Object.assign(BUBBLE, { section: "Outside your bubble", pref: null });
+  h += `<div class="sec"><h3>Outside your bubble</h3><span class="sub">one story you didn't ask for</span>${mk("bubble")}</div>
+    <div class="bubble"><article class="story line"><a class="h" href="${BUBBLE.url}" target="_blank" rel="noopener">${esc(BUBBLE.headline)}<span class="ext">↗</span></a>${storyMeta(BUBBLE)}</article></div>`;
+  const total = TOP.reduce((n, t) => n + t.sentences.length, 0), kept = TOP.reduce((n, t) => n + t.sentences.filter(s => s.ok).length, 0);
+  h += `<div class="foot"><button id="editBtn">Edit my interests</button> · <button class="u" id="unsubBtn">Unsubscribe</button>${mk("footer")}
+    <p class="howmade">How this edition was made: stories from many outlets were grouped into events and ranked for you. Summaries by Claude use only the linked sources; ${kept} of ${total} sentences passed fact-checking and the rest were removed. Numbers: published closes, cited above. Not investment advice.</p></div>`;
+  ed.innerHTML = h;
+  renderPrefs();
+}
+
+// ---------------------------------------------------------------------------
+// Interactions
+// ---------------------------------------------------------------------------
+const pop = $("#pop");
+function openPop(anchor, html) {
+  pop.innerHTML = `<button class="x" aria-label="Close">×</button>` + html;
+  pop.classList.add("show");
+  const r = anchor.getBoundingClientRect();
+  const w = Math.min(360, window.innerWidth - 24);
+  let left = r.left + window.scrollX;
+  if (left + w > window.scrollX + window.innerWidth - 12) left = window.scrollX + window.innerWidth - w - 12;
+  pop.style.left = Math.max(12, left) + "px";
+  pop.style.top = (r.bottom + window.scrollY + 8) + "px";
+  pop.querySelector(".x").onclick = closePop;
+}
+function closePop() { pop.classList.remove("show"); }
+
+function bars(f) {
+  const rows = [["Relevance", f.relevance], ["Importance", f.importance], ["Freshness", f.freshness], ["Section fit", f.affinity], ["Novelty", f.novelty], ["Dislike", -f.dislike]];
+  return `<div class="bars">${rows.map(([k, v]) => `<div><span>${k}</span><i><b class="${v < 0 ? "neg" : ""}" style="width:${Math.abs(v) * 100}%"></b></i><span>${v.toFixed(2)}</span></div>`).join("")}</div>`;
+}
+
+const prefScore = {};
+PREFS.forEach(p => prefScore[p] = 0);
+function renderPrefs() {
+  $("#prefs").innerHTML = PREFS.map(p => `<span class="pref ${prefScore[p] > 0 ? "boost" : prefScore[p] < 0 ? "cut" : ""}">${esc(p)}${prefScore[p] > 0 ? " ↑" : prefScore[p] < 0 ? " ↓" : ""}</span>`).join("");
+}
+
+let toastT;
+function toast(msg) {
+  const t = $("#toast");
+  t.innerHTML = msg;
+  t.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove("show"), 4200);
+}
+
+function behind(id) {
+  const t = ALL[id];
+  const srcs = t.outlets.map(k => S[k].name);
+  $("#drawerBody").innerHTML = `
+    <p style="font-size:14px;color:var(--muted);margin:0 0 16px">How "${esc(t.headline)}" reached this reader. These are the steps the pipeline runs for every story; this demo shows them for one.</p>
+    <div class="step"><span class="n">1</span><h5>Ingest</h5><p>Every hour, feeds for every reader's interests are fetched once and shared. These articles came in:</p>
+      <div class="mono">${srcs.map((s, i) => `[a${i + 1}] ${s}`).join("\n")}</div></div>
+    <div class="step"><span class="n">2</span><h5>Group into one event</h5><p>Each headline becomes an embedding (bge-small). Articles close enough to each other (cosine ≥ τ) join one event. <b>${srcs.length} outlets</b> become the importance signal.</p></div>
+    <div class="step"><span class="n">3</span><h5>Write once, with citations</h5><p>Claude sees only the numbered sources and must cite each sentence. The summary is written once per event and reused for every reader.</p>
+      <div class="mono">${t.sentences.map(s => `"${s.text}"  → ${s.cites.map(c => "a" + (t.outlets.indexOf(c) + 1)).join(", ")}`).map(esc).join("\n")}</div></div>
+    <div class="step"><span class="n">4</span><h5>Fact-check before sending</h5><p>A numbers check, then a second model as verifier. Unsupported sentences are removed.</p>
+      <ul class="claims">${t.sentences.map(s => `<li><span class="v ${s.ok ? "ok" : "no"}">${s.ok ? "SUPPORTED" : "REMOVED"}</span><br>${s.ok ? esc(s.text) : "<s>" + esc(s.text) + "</s><br><i>" + esc(s.reason) + "</i>"}</li>`).join("")}</ul></div>
+    <div class="step"><span class="n">5</span><h5>Rank for this reader</h5><p>Retrieved by this reader's "${esc(t.pref)}" interest vector, then scored on six signals, diversified (MMR) and given ${t.section === "Markets" ? "a top-story slot" : "a slot"} by the section bandit.</p>${bars(t.features)}</div>
+    <div class="step"><span class="n">6</span><h5>Personal line + explanation</h5><p>"Why it matters to you" is written for this reader; "Why this?" is generated from the top signals: <i>${esc(t.explain)}</i>.</p></div>
+    <div class="step"><span class="n">7</span><h5>Deliver and learn</h5><p>Sent at the reader's chosen time; the impression is logged with its features. Clicks and votes update the interest vectors and the bandit for tomorrow.</p></div>
+    <p style="font-size:12.5px;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px">Scores in this demo are illustrative. The removed sentence is shown on purpose, to demonstrate what the fact-checker catches.</p>`;
+  $("#drawer").classList.add("open");
+  $("#scrim").classList.add("show");
+}
+function closeDrawer() { $("#drawer").classList.remove("open"); $("#scrim").classList.remove("show"); }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) { if (!e.target.closest(".pop")) closePop(); return; }
+  if (b.closest(".pop")) return;
+  if (b.dataset.explain) {
+    const [h, p] = EXPLAIN[b.dataset.explain];
+    openPop(b, `<h4>${esc(h)}</h4><p>${esc(p)}</p>`);
+  } else if (b.dataset.outlets) {
+    closePop();
+    $("#out-" + b.dataset.outlets).classList.toggle("open");
+  } else if (b.dataset.why) {
+    const it = ALL[b.dataset.why];
+    openPop(b, `<h4>Why am I seeing this?</h4><p><i>${esc(it.explain)}</i></p>${bars(it.features)}<p style="font-size:12.5px;color:var(--muted)">Score = weighted sum of these signals, minus similarity to stories you disliked. Illustrative values in this demo.</p>`);
+  } else if (b.dataset.fc) {
+    const it = ALL[b.dataset.fc];
+    openPop(b, `<h4>Fact-check receipts</h4><ul class="claims">${it.sentences.map(s => `<li><span class="v ${s.ok ? "ok" : "no"}">${s.ok ? "✓ SUPPORTED" : "✗ REMOVED"}</span><br>${s.ok ? esc(s.text) : "<s>" + esc(s.text) + "</s>"}<br>${s.ok ? "Sources: " + s.cites.map(c => `<a href="${S[c].url}" target="_blank" rel="noopener">${esc(S[c].name)}</a>`).join(", ") : "<i>" + esc(s.reason) + "</i>"}</li>`).join("")}</ul>${it.whyCite ? `<p style="font-size:12.5px">"Why it matters" is backed by <a href="${S[it.whyCite].url}" target="_blank" rel="noopener">${esc(S[it.whyCite].name)}</a>.</p>` : ""}`);
+  } else if (b.dataset.behind) {
+    closePop(); behind(b.dataset.behind);
+  } else if (b.dataset.vote) {
+    closePop();
+    const it = ALL[b.dataset.id], up = b.dataset.vote === "up";
+    b.parentElement.querySelectorAll(".vote").forEach(v => v.classList.remove("on"));
+    b.classList.add("on");
+    if (it.pref && it.pref in prefScore) { prefScore[it.pref] += up ? 1 : -1; renderPrefs(); }
+    toast(`${up ? "👍 More" : "👎 Less"} like this: <b>${esc(it.section)}</b>. In the real email this vote is recorded, nudges your "${esc(it.pref || "exploration")}" interest vector and the section bandit, and tomorrow's ranking changes.`);
+  } else if (b.dataset.src) {
+    const s = S[b.dataset.src];
+    openPop(b, `<h4>Where this number comes from</h4><p>${esc(b.dataset.note)}</p><p><a href="${s.url}" target="_blank" rel="noopener">${esc(s.name)} ↗</a></p><p style="font-size:12.5px;color:var(--muted)">In the live product these are fetched from market data APIs at send time and printed as-is.</p>`);
+  } else if (b.id === "editBtn") {
+    closePop();
+    $("#modalCard").innerHTML = `<h3>Edit my interests</h3><p>Readers change everything on a settings page, or just describe it:</p>
+      <div class="nlbox">"Indian markets and gold in AED, my cities are Dubai, Mumbai and London, AI news, and less politics."</div>
+      <p>Claude turns that into the settings below for the reader to check before saving.</p><img src="settings.png" alt="The Brief settings page">
+      <p style="text-align:right;margin:10px 0 0"><button class="chipbtn" id="modalClose">Close</button></p>`;
+    $("#modal").classList.add("show");
+  } else if (b.id === "modalClose") {
+    $("#modal").classList.remove("show");
+  } else if (b.id === "unsubBtn") {
+    toast("In the real email this asks you to confirm, then stops your edition and deletes your data within 24 hours.");
+  } else if (b.id === "explainBtn") {
+    const on = !document.body.classList.contains("explain");
+    document.body.classList.toggle("explain", on);
+    b.setAttribute("aria-pressed", on);
+    closePop();
+  } else if (b.id === "drawerClose") {
+    closeDrawer();
+  }
+});
+$("#scrim").addEventListener("click", closeDrawer);
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") $("#modal").classList.remove("show"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closePop(); closeDrawer(); $("#modal").classList.remove("show"); } });
+
+render();
+</script>
+</body>
+</html>
