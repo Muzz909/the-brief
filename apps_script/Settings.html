@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f2e7;
+    --paper-2: #efe7d6;
+    --desk: #e6dece;
+    --ink: #1b1b1b;
+    --muted: #6b6256;
+    --rule: #cfc4ae;
+    --ox: #7d1d1d;
+    --ox-soft: #f1e1dc;
+    --display: "Playfair Display", Georgia, serif;
+    --body: "Source Serif 4", Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .paper {
+    max-width: 920px;
+    margin: 28px auto 120px;
+    background: var(--paper);
+    border: 1px solid #d6ccb8;
+    box-shadow: 0 1px 0 #d6ccb8, 0 18px 40px -28px rgba(60, 40, 10, .35);
+    padding: 22px 44px 48px;
+  }
+  @media (max-width: 640px) { .paper { margin: 0 0 120px; padding: 16px 18px 40px; border: 0; } }
+
+  /* Masthead */
+  .ears { display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .mast { font-family: var(--display); font-weight: 900; font-size: clamp(56px, 11vw, 104px); line-height: .95; letter-spacing: -.03em; text-align: center; margin: 10px 0 4px; }
+  .motto { text-align: center; font-style: italic; color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+  .dateline { border-top: 4px double var(--ink); border-bottom: 1px solid var(--ink); padding: 7px 0; display: flex; justify-content: space-between; gap: 12px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  .dateline span:nth-child(2) { text-align: center; flex: 1; }
+  @media (max-width: 640px) { .dateline span:first-child, .dateline span:last-child { display: none; } }
+
+  /* Lede */
+  .lede { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; padding: 26px 0 22px; border-bottom: 1px solid var(--ink); }
+  .lede h1 { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 4.6vw, 44px); line-height: 1.05; letter-spacing: -.01em; margin: 0 0 12px; }
+  .lede .deck { font-style: italic; font-size: 19px; color: #3a352e; margin: 0; }
+  .lede aside { border-left: 1px solid var(--rule); padding-left: 24px; font-size: 15.5px; }
+  .lede aside p { margin: 0 0 10px; }
+  .lede aside b { font-variant: small-caps; letter-spacing: .04em; }
+  @media (max-width: 720px) { .lede { grid-template-columns: 1fr; gap: 16px; } .lede aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 14px; } }
+  .dropcap::first-letter { font-family: var(--display); font-weight: 900; float: left; font-size: 3.1em; line-height: .85; padding: 4px 8px 0 0; color: var(--ox); }
+
+  .notice { margin: 18px 0 0; padding: 12px 16px; background: var(--ox-soft); border-left: 3px solid var(--ox); font-size: 15.5px; }
+
+  /* Sections */
+  section.part { padding: 26px 0 6px; border-bottom: 1px solid var(--rule); }
+  section.part:last-of-type { border-bottom: 0; }
+  .part-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+  .part-head h2 { font-family: var(--display); font-weight: 700; font-size: 27px; margin: 0; letter-spacing: -.005em; }
+  .part-head h2 .num { font-style: italic; color: var(--ox); margin-right: 8px; }
+  .part-sub { color: var(--muted); font-style: italic; font-size: 15px; margin: -8px 0 16px; }
+
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 36px; }
+  .cols > .col + .col { border-left: 1px solid var(--rule); padding-left: 36px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } .cols > .col + .col { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 8px; } }
+
+  .block { margin-bottom: 22px; }
+  .block.off .block-body { opacity: .35; pointer-events: none; }
+  .block-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .hint { color: var(--muted); font-size: 14px; font-style: italic; margin: 6px 0 0; }
+
+  label.field { display: block; margin-bottom: 14px; }
+  label.field > span { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 4px; }
+  input[type=text], input[type=email], input[type=time], select {
+    width: 100%; font: inherit; font-size: 17px; color: var(--ink);
+    background: transparent; border: 0; border-bottom: 1.5px solid var(--ink); border-radius: 0;
+    padding: 6px 2px; outline: none;
+  }
+  input:focus, select:focus { border-bottom-color: var(--ox); background: rgba(125, 29, 29, .04); }
+  input[readonly] { color: var(--muted); border-bottom-style: dashed; }
+  select { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: calc(100% - 12px) 55%, calc(100% - 7px) 55%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 24px; }
+  .row { display: flex; gap: 14px; }
+  .row > * { flex: 1; min-width: 0; }
+
+  /* In print / left out switch */
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); user-select: none; white-space: nowrap; }
+  .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .switch .track { width: 34px; height: 18px; border: 1.5px solid var(--ink); border-radius: 10px; position: relative; transition: background .15s; }
+  .switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); transition: transform .15s; }
+  .switch input:checked + .track { background: var(--ink); }
+  .switch input:checked + .track::after { transform: translateX(16px); background: var(--paper); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--ox); outline-offset: 2px; }
+  .switch .state::before { content: "Left out"; }
+  .switch input:checked ~ .state { color: var(--ink); }
+  .switch input:checked ~ .state::before { content: "In print"; }
+
+  /* Chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font: inherit; font-size: 15px; cursor: pointer;
+    border: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+    padding: 4px 12px; border-radius: 999px; line-height: 1.4;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .chip:focus-visible { outline: 2px solid var(--ox); outline-offset: 2px; }
+  .chip.tag { cursor: default; background: var(--paper-2); border-color: var(--paper-2); padding-right: 6px; }
+  .chip.tag button { font: inherit; border: 0; background: transparent; cursor: pointer; color: var(--muted); padding: 0 4px; font-size: 16px; line-height: 1; }
+  .chip.tag button:hover { color: var(--ox); }
+
+  .adder { display: flex; gap: 10px; align-items: flex-end; margin-top: 10px; }
+  .adder input, .adder select { flex: 1; }
+  .btn-small { font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: transparent; border: 1.5px solid var(--ink); padding: 6px 12px; cursor: pointer; color: var(--ink); white-space: nowrap; }
+  .btn-small:hover { background: var(--ink); color: var(--paper); }
+
+  .checks { display: flex; gap: 18px; flex-wrap: wrap; }
+  .checks label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .checks input { accent-color: var(--ink); width: 16px; height: 16px; }
+
+  .cities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  @media (max-width: 640px) { .cities { grid-template-columns: 1fr; gap: 4px; } }
+  .cities .field span { color: var(--ox); }
+
+  /* Press bar */
+  .pressbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    background: var(--ink); color: var(--paper);
+    border-top: 4px double var(--paper);
+  }
+  .pressbar-inner { max-width: 920px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .pressbar .status { font-style: italic; font-size: 15px; flex: 1; min-width: 200px; }
+  .pressbar .status.err { color: #ffb4a8; font-style: normal; }
+  .pressbar .actions { display: flex; gap: 10px; }
+  .btn-print { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .01em; background: var(--paper); color: var(--ink); border: 0; padding: 10px 22px; cursor: pointer; }
+  .btn-print:hover { background: #fff; }
+  .btn-ghost { font: inherit; font-size: 15px; background: transparent; color: var(--paper); border: 1.5px solid var(--paper); padding: 9px 16px; cursor: pointer; }
+  .btn-ghost:hover { background: rgba(255,255,255,.08); }
+  button[disabled] { opacity: .5; cursor: progress; }
+
+  .nl { margin: 22px 0 0; padding: 18px 20px; background: var(--paper-2); border: 1px solid var(--rule); }
+  .nl h3 { font-family: var(--display); font-size: 21px; margin: 0 0 4px; }
+  .nl p { margin: 0 0 10px; color: var(--muted); font-style: italic; font-size: 15px; }
+  .nl textarea { width: 100%; min-height: 70px; font: inherit; font-size: 16px; background: var(--paper); border: 1.5px solid var(--ink); padding: 10px 12px; resize: vertical; color: var(--ink); }
+  .nl .nl-row { display: flex; gap: 12px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .nl .nl-msg { font-size: 14px; color: var(--muted); font-style: italic; }
+  .changed { outline: 2px solid var(--ox); outline-offset: 3px; transition: outline-color 2s; }
+  .done { text-align: center; padding: 40px 0 20px; }
+  .done h2 { font-family: var(--display); font-size: 34px; margin: 0 0 10px; }
+  .done p { font-size: 18px; max-width: 520px; margin: 0 auto 10px; }
+  .fineprint { margin-top: 26px; font-size: 13px; color: var(--muted); text-align: center; }
+  .fineprint a { color: var(--muted); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<main class="paper">
+  <div class="ears">
+    <span id="ear-left">Vol. I</span>
+    <span id="ear-right"></span>
+  </div>
+  <div class="mast">The Brief</div>
+  <p class="motto">Your morning, on one page.</p>
+  <div class="dateline">
+    <span>Est. 2026</span>
+    <span id="today"></span>
+    <span>Free · daily</span>
+  </div>
+
+  <div id="form-wrap">
+    <div class="lede">
+      <div>
+        <h1 id="lede-title">Everything you care about, in one email, every morning.</h1>
+        <p class="deck" id="lede-deck">Markets, money, politics and the cities your people live in, read and edited down to five minutes before you wake up.</p>
+      </div>
+      <aside>
+        <p class="dropcap">Pick your sections below. Each morning The Brief gathers the numbers straight from market data, collects the headlines, and has Claude pick and explain the stories that matter to you.</p>
+        <p><b>Every number</b> comes from the data source, not the AI, and <b>every story</b> links to the original publisher.</p>
+      </aside>
+    </div>
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="nl">
+      <h3>Describe your perfect morning</h3>
+      <p>Write it in your own words and Claude fills in the settings below for you to check, e.g. "Indian markets and gold in AED, my family in Singapore and Toronto, AI news, and cricket."</p>
+      <textarea id="nl-text" maxlength="1000" aria-label="Describe your interests"></textarea>
+      <div class="nl-row"><button type="button" class="btn-small" id="nl-go">Fill in for me</button><span class="nl-msg" id="nl-msg"></span></div>
+    </div>
+
+    <form id="f" novalidate>
+      <!-- I. The reader -->
+      <section class="part">
+        <div class="part-head"><h2><span class="num">I.</span>The Reader</h2></div>
+        <div class="row">
+          <label class="field"><span>Your name</span><input type="text" id="name" maxlength="40" autocomplete="given-name" required></label>
+          <label class="field"><span>Email</span><input type="email" id="email" maxlength="120" autocomplete="email" required></label>
+        </div>
+        <div class="row">
+          <label class="field"><span>Deliver at</span><input type="time" id="sendTime" step="900"></label>
+          <label class="field"><span>Your time zone</span><select id="tz"></select></label>
+        </div>
+      </section>
+
+      <!-- II. Places -->
+      <section class="part">
+        <div class="part-head">
+          <h2><span class="num">II.</span>Your Places</h2>
+          <label class="switch"><input type="checkbox" data-section="cities"><span class="track"></span><span class="state"></span></label>
+        </div>
+        <p class="part-sub">Up to three cities where you or your people live. Each gets local news and the day's weather.</p>
+        <div class="block" data-block="cities">
+          <div class="block-body cities">
+            <label class="field"><span>City one</span><input type="text" class="city" maxlength="60" placeholder="e.g. London"></label>
+            <label class="field"><span>City two</span><input type="text" class="city" maxlength="60" placeholder="e.g. Singapore"></label>
+            <label class="field"><span>City three</span><input type="text" class="city" maxlength="60" placeholder="e.g. Toronto"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- III. Money -->
+      <section class="part">
+        <div class="part-head"><h2><span class="num">III.</span>The Money Pages</h2></div>
+        <div class="cols">
+          <div class="col">
+            <div class="block" data-block="markets">
+              <div class="block-title"><span class="kicker">Markets</span>
+                <label class="switch"><input type="checkbox" data-section="markets"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body"><div class="chips" id="indices" role="group" aria-label="Market indices"></div></div>
+            </div>
+            <div class="block" data-block="watchlist">
+              <div class="block-title"><span class="kicker">Stock watchlist</span>
+                <label class="switch"><input type="checkbox" data-section="watchlist"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body">
+                <div class="chips" id="watchlist-tags"></div>
+                <div class="adder"><input type="text" id="watchlist-in" placeholder="Ticker, e.g. RELIANCE.NS, AAPL, 2222.SR" aria-label="Add a ticker"><button type="button" class="btn-small" id="watchlist-add">Add</button></div>
+                <p class="hint">Use Yahoo Finance symbols: .NS for NSE, .BO for BSE, .SR for Tadawul.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="block" data-block="forex">
+              <div class="block-title"><span class="kicker">Currencies</span>
+                <label class="switch"><input type="checkbox" data-section="forex"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body">
+                <div class="chips" id="forex-tags"></div>
+                <div class="adder">
+                  <select id="fx-from" aria-label="From currency"></select>
+                  <span aria-hidden="true" style="padding-bottom:6px">→</span>
+                  <select id="fx-to" aria-label="To currency"></select>
+                  <button type="button" class="btn-small" id="fx-add">Add</button>
+                </div>
+              </div>
+            </div>
+            <div class="block" data-block="gold">
+              <div class="block-title"><span class="kicker">Gold</span>
+                <label class="switch"><input type="checkbox" data-section="gold"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body">
+                <div class="row">
+                  <label class="field"><span>Currency</span><select id="gold-cur"></select></label>
+                  <label class="field"><span>Unit</span><select id="gold-unit"></select></label>
+                </div>
+                <div class="checks" id="gold-karats" role="group" aria-label="Karats">
+                  <label><input type="checkbox" value="24"> 24K</label>
+                  <label><input type="checkbox" value="22"> 22K</label>
+                  <label><input type="checkbox" value="18"> 18K</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- IV. News -->
+      <section class="part">
+        <div class="part-head"><h2><span class="num">IV.</span>The News</h2></div>
+        <div class="cols">
+          <div class="col">
+            <div class="block" data-block="politics">
+              <div class="block-title"><span class="kicker">Politics</span>
+                <label class="switch"><input type="checkbox" data-section="politics"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body">
+                <div class="chips" id="politics" role="group" aria-label="Politics regions"></div>
+                <p class="hint">Neutral, factual summaries, drawing on more than one outlet where possible.</p>
+              </div>
+            </div>
+            <div class="block" data-block="tech">
+              <div class="block-title"><span class="kicker">Tech &amp; AI</span>
+                <label class="switch"><input type="checkbox" data-section="tech"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body"><p class="hint" style="margin-top:0">Launches, deals and the AI industry, trimmed to what's new.</p></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="block" data-block="topics">
+              <div class="block-title"><span class="kicker">Your own topics</span>
+                <label class="switch"><input type="checkbox" data-section="topics"><span class="track"></span><span class="state"></span></label></div>
+              <div class="block-body">
+                <div class="chips" id="topics-tags"></div>
+                <div class="adder"><input type="text" id="topics-in" maxlength="40" placeholder="Anything: cricket, Formula 1, Google APM…" aria-label="Add a topic"><button type="button" class="btn-small" id="topics-add">Add</button></div>
+                <p class="hint">Up to five. Each gets its own short column.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <p class="fineprint" id="fineprint"></p>
+  </div>
+
+  <div id="done" class="done" hidden>
+    <h2 id="done-title"></h2>
+    <p id="done-body"></p>
+  </div>
+</main>
+
+<div class="pressbar" id="pressbar">
+  <div class="pressbar-inner">
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="preview" hidden>Send me a preview now</button>
+      <button type="button" class="btn-print" id="save">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BOOT = <?!= bootJson ?>;
+  const $ = (s, el) => (el || document).querySelector(s);
+  const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+  const P = JSON.parse(JSON.stringify(BOOT.prefs));
+  const L = BOOT.options.limits;
+  const state = {
+    indices: new Set(P.indices || []),
+    politics: new Set(P.politics || []),
+    watchlist: (P.watchlist || []).slice(),
+    forex: (P.forex || []).slice(),
+    topics: (P.topics || []).slice(),
+  };
+
+  // ---------- Masthead ----------
+  const now = new Date();
+  $('#today').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  $('#ear-right').textContent = BOOT.mode === 'edit' ? 'Edition for ' + (P.name || 'you') : BOOT.seatsLeft + ' of ' + BOOT.maxReaders + ' seats left';
+  if (BOOT.mode === 'edit') {
+    $('#lede-title').textContent = 'Welcome back, ' + (P.name || 'reader') + '. Rearrange your front page.';
+    $('#lede-deck').textContent = 'Changes apply from your next edition. Use the preview button to see it right now.';
+    $('#save').textContent = 'Save changes';
+    $('#email').readOnly = true;
+    if (BOOT.status === 'active') $('#preview').hidden = false;
+    if (BOOT.status === 'pending') showNotice('You haven’t confirmed your email yet. Check your inbox for the confirmation link.');
+    if (BOOT.status === 'waitlist') showNotice('You’re on the waitlist. You can still set up your interests now.');
+    const unsub = document.createElement('a');
+    unsub.href = BOOT.appUrl + '?a=unsub&t=' + encodeURIComponent(BOOT.token);
+    unsub.textContent = 'Unsubscribe';
+    $('#fineprint').append('Your private edit link works like a key, so don’t share it. · ', unsub);
+  } else {
+    if (BOOT.invalidLink) showNotice('That edit link isn’t valid any more. You can sign up again below.');
+    if (BOOT.seatsLeft <= 0) showNotice('All ' + BOOT.maxReaders + ' seats are taken right now. Sign up and you’ll join the waitlist.');
+    $('#fineprint').textContent = 'We send one email a day plus a confirmation. Unsubscribe from any edition with one click.';
+  }
+
+  function showNotice(t) { const n = $('#notice'); n.textContent = t; n.hidden = false; }
+
+  // ---------- Reader ----------
+  $('#name').value = P.name || '';
+  $('#email').value = P.email || '';
+  $('#sendTime').value = P.sendTime || '08:00';
+
+  const detected = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'Asia/Dubai';
+  const tzWanted = BOOT.mode === 'edit' ? (P.tz || detected) : detected;
+  let zones = [];
+  try { zones = Intl.supportedValuesOf('timeZone'); } catch (e) {}
+  if (!zones.length) zones = ['Asia/Dubai', 'Asia/Kolkata', 'Asia/Riyadh', 'Asia/Karachi', 'Asia/Qatar', 'Asia/Kuwait', 'Asia/Muscat', 'Asia/Bahrain', 'Europe/London', 'Europe/Berlin', 'America/New_York', 'America/Chicago', 'America/Los_Angeles', 'America/Toronto', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney', 'Africa/Cairo'];
+  if (zones.indexOf(tzWanted) < 0) zones.unshift(tzWanted);
+  const tzSel = $('#tz');
+  zones.forEach(z => { const o = new Option(z.replace(/_/g, ' '), z); tzSel.add(o); });
+  tzSel.value = tzWanted;
+
+  // ---------- Section switches ----------
+  $$('input[data-section]').forEach(cb => {
+    const key = cb.dataset.section;
+    cb.checked = !!(P.sections || {})[key];
+    const sync = () => { const b = $('[data-block="' + key + '"]'); if (b) b.classList.toggle('off', !cb.checked); };
+    cb.addEventListener('change', sync);
+    sync();
+  });
+
+  // ---------- Cities ----------
+  $$('.city').forEach((inp, i) => { inp.value = (P.cities || [])[i] || ''; });
+
+  // ---------- Toggle chips ----------
+  function toggleChips(container, items, set) {
+    items.forEach(it => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = it.label; b.dataset.key = it.key;
+      b.setAttribute('aria-pressed', set.has(it.key) ? 'true' : 'false');
+      b.addEventListener('click', () => {
+        if (set.has(it.key)) set.delete(it.key); else set.add(it.key);
+        b.setAttribute('aria-pressed', set.has(it.key) ? 'true' : 'false');
+      });
+      container.append(b);
+    });
+  }
+  toggleChips($('#indices'), BOOT.options.indices.map(x => ({ key: x.symbol, label: x.label })), state.indices);
+  toggleChips($('#politics'), BOOT.options.politics, state.politics);
+
+  // ---------- Tag lists ----------
+  function tagList(listKey, container, labelOf) {
+    const render = () => {
+      container.textContent = '';
+      state[listKey].forEach((v, i) => {
+        const c = document.createElement('span'); c.className = 'chip tag';
+        c.append(labelOf ? labelOf(v) : v);
+        const x = document.createElement('button'); x.type = 'button'; x.textContent = '×';
+        x.setAttribute('aria-label', 'Remove ' + v);
+        x.addEventListener('click', () => { state[listKey].splice(i, 1); render(); });
+        c.append(x); container.append(c);
+      });
+    };
+    render();
+    return render;
+  }
+  const renderWatch = tagList('watchlist', $('#watchlist-tags'));
+  const renderFx = tagList('forex', $('#forex-tags'), v => v.replace('-', ' → '));
+  const renderTopics = tagList('topics', $('#topics-tags'));
+
+  function addTo(listKey, value, max, render, inputEl) {
+    value = value.trim();
+    if (!value) return;
+    if (state[listKey].length >= max) { say('That list is full (' + max + ' max).', true); return; }
+    if (state[listKey].some(v => v.toLowerCase() === value.toLowerCase())) { if (inputEl) inputEl.value = ''; return; }
+    state[listKey].push(value); render();
+    if (inputEl) inputEl.value = '';
+    say('');
+  }
+  $('#watchlist-add').addEventListener('click', () => {
+    const v = $('#watchlist-in').value.toUpperCase().replace(/\s+/g, '');
+    if (v && !/^[A-Z0-9.\-=^]{1,15}$/.test(v)) { say('That doesn’t look like a ticker symbol.', true); return; }
+    addTo('watchlist', v, L.watchlist, renderWatch, $('#watchlist-in'));
+  });
+  $('#topics-add').addEventListener('click', () => addTo('topics', $('#topics-in').value, L.topics, renderTopics, $('#topics-in')));
+  [['#watchlist-in', '#watchlist-add'], ['#topics-in', '#topics-add']].forEach(([i, b]) => {
+    $(i).addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); $(b).click(); } });
+  });
+
+  // ---------- Forex ----------
+  const fxFrom = $('#fx-from'), fxTo = $('#fx-to');
+  BOOT.options.currencies.forEach(c => { fxFrom.add(new Option(c, c)); fxTo.add(new Option(c, c)); });
+  fxFrom.value = 'AED'; fxTo.value = 'INR';
+  $('#fx-add').addEventListener('click', () => {
+    if (fxFrom.value === fxTo.value) { say('Pick two different currencies.', true); return; }
+    addTo('forex', fxFrom.value + '-' + fxTo.value, L.forex, renderFx);
+  });
+
+  // ---------- Gold ----------
+  const goldCur = $('#gold-cur'), goldUnit = $('#gold-unit');
+  BOOT.options.currencies.forEach(c => goldCur.add(new Option(c, c)));
+  BOOT.options.goldUnits.forEach(u => goldUnit.add(new Option(u.label.replace('per ', ''), u.key)));
+  goldCur.value = (P.gold || {}).currency || 'AED';
+  goldUnit.value = (P.gold || {}).unit || 'g';
+  $$('#gold-karats input').forEach(cb => { cb.checked = ((P.gold || {}).karats || []).indexOf(cb.value) >= 0; });
+
+  // ---------- Status + collect ----------
+  function say(msg, isErr) { const s = $('#status'); s.textContent = msg; s.classList.toggle('err', !!isErr); }
+
+  function collect() {
+    const sections = {};
+    $$('input[data-section]').forEach(cb => { sections[cb.dataset.section] = cb.checked; });
+    // Pick up anything typed but not yet added
+    if ($('#watchlist-in').value.trim()) $('#watchlist-add').click();
+    if ($('#topics-in').value.trim()) $('#topics-add').click();
+    return {
+      token: BOOT.token,
+      name: $('#name').value,
+      email: $('#email').value,
+      tz: tzSel.value,
+      sendTime: $('#sendTime').value || '08:00',
+      cities: $$('.city').map(i => i.value.trim()).filter(Boolean),
+      sections,
+      indices: Array.from(state.indices),
+      watchlist: state.watchlist.slice(),
+      forex: state.forex.slice(),
+      gold: { currency: goldCur.value, unit: goldUnit.value, karats: $$('#gold-karats input').filter(c => c.checked).map(c => c.value) },
+      politics: Array.from(state.politics),
+      topics: state.topics.slice(),
+    };
+  }
+
+  function validate(d) {
+    if (!d.name.trim()) return 'Please tell us your name.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim())) return 'Please enter a valid email address.';
+    if (!Object.values(d.sections).some(Boolean)) return 'Turn on at least one section.';
+    if (d.sections.cities && !d.cities.length) return 'Add at least one city, or switch Your Places off.';
+    return '';
+  }
+
+  const saveBtn = $('#save'), previewBtn = $('#preview');
+  saveBtn.addEventListener('click', () => {
+    const d = collect();
+    const err = validate(d);
+    if (err) { say(err, true); return; }
+    saveBtn.disabled = true; previewBtn.disabled = true;
+    say(BOOT.mode === 'edit' ? 'Saving…' : 'Setting the type…');
+    google.script.run
+      .withSuccessHandler(res => {
+        saveBtn.disabled = false; previewBtn.disabled = false;
+        if (!res || !res.ok) { say((res && res.message) || 'Something went wrong.', true); return; }
+        if (BOOT.mode === 'edit') { say(res.message); return; }
+        finish(res);
+      })
+      .withFailureHandler(e => { saveBtn.disabled = false; previewBtn.disabled = false; say('Couldn’t save: ' + (e && e.message || e), true); })
+      .saveSettings(d);
+  });
+
+  previewBtn.addEventListener('click', () => {
+    previewBtn.disabled = true; saveBtn.disabled = true;
+    say('Stopping the presses… printing your edition (about 30 seconds).');
+    // Save first so the preview reflects what's on screen
+    const d = collect();
+    const err = validate(d);
+    if (err) { say(err, true); previewBtn.disabled = false; saveBtn.disabled = false; return; }
+    google.script.run
+      .withSuccessHandler(() => {
+        google.script.run
+          .withSuccessHandler(res => { previewBtn.disabled = false; saveBtn.disabled = false; say(res.message, !res.ok); })
+          .withFailureHandler(e => { previewBtn.disabled = false; saveBtn.disabled = false; say('Preview failed: ' + (e && e.message || e), true); })
+          .sendPreview(BOOT.token);
+      })
+      .withFailureHandler(e => { previewBtn.disabled = false; saveBtn.disabled = false; say('Couldn’t save: ' + (e && e.message || e), true); })
+      .saveSettings(d);
+  });
+
+  // ---------- Settings in plain English ----------
+  function flash(el) { if (!el) return; el.classList.add('changed'); setTimeout(() => el.classList.remove('changed'), 2500); }
+  function applyPrefs(x) {
+    const changed = [];
+    if (Array.isArray(x.cities)) { $$('.city').forEach((inp, i) => { const v = x.cities[i] || ''; if (inp.value !== v) { inp.value = v; flash(inp); } }); changed.push('places'); }
+    const setFrom = (key, arr, sel) => { if (!Array.isArray(arr)) return; state[key] = new Set(arr); $$(sel + ' .chip').forEach(b => b.setAttribute('aria-pressed', state[key].has(b.dataset.key) ? 'true' : 'false')); flash($(sel)); changed.push(key); };
+    setFrom('indices', x.indices, '#indices');
+    setFrom('politics', x.politics, '#politics');
+    if (Array.isArray(x.watchlist)) { state.watchlist = x.watchlist.slice(0, L.watchlist).map(s => String(s).toUpperCase()); renderWatch(); flash($('#watchlist-tags')); changed.push('watchlist'); }
+    if (Array.isArray(x.forex)) { state.forex = x.forex.filter(v => /^[A-Z]{3}-[A-Z]{3}$/.test(v)).slice(0, L.forex); renderFx(); flash($('#forex-tags')); changed.push('currencies'); }
+    if (Array.isArray(x.topics)) { state.topics = x.topics.slice(0, L.topics); renderTopics(); flash($('#topics-tags')); changed.push('topics'); }
+    if (x.gold) { if (x.gold.currency) goldCur.value = x.gold.currency; if (x.gold.unit) goldUnit.value = x.gold.unit;
+      if (Array.isArray(x.gold.karats)) $$('#gold-karats input').forEach(cb => { cb.checked = x.gold.karats.indexOf(cb.value) >= 0; });
+      flash($('[data-block="gold"]')); changed.push('gold'); }
+    if (x.sections) $$('input[data-section]').forEach(cb => { const k = cb.dataset.section; if (k in x.sections && cb.checked !== !!x.sections[k]) { cb.checked = !!x.sections[k]; cb.dispatchEvent(new Event('change')); flash(cb.closest('.switch')); } });
+    if (x.sendTime && /^\d{2}:\d{2}$/.test(x.sendTime)) { $('#sendTime').value = x.sendTime; flash($('#sendTime')); }
+    return changed;
+  }
+  $('#nl-go').addEventListener('click', () => {
+    const text = $('#nl-text').value.trim();
+    if (!text) { $('#nl-msg').textContent = 'Write a sentence or two first.'; return; }
+    $('#nl-go').disabled = true; $('#nl-msg').textContent = 'Reading\u2026';
+    google.script.run
+      .withSuccessHandler(res => {
+        $('#nl-go').disabled = false;
+        if (!res || !res.ok) { $('#nl-msg').textContent = (res && res.message) || 'Couldn\u2019t read that.'; return; }
+        const changed = applyPrefs(res.prefs || {});
+        $('#nl-msg').textContent = 'Filled in ' + (changed.join(', ') || 'nothing new') + '. Highlighted below: check, then save.' + (res.prefs.note ? ' Note: ' + res.prefs.note : '');
+      })
+      .withFailureHandler(e => { $('#nl-go').disabled = false; $('#nl-msg').textContent = 'Couldn\u2019t read that: ' + (e && e.message || e); })
+      .parseInterests(text);
+  });
+
+  function finish(res) {
+    $('#form-wrap').hidden = true;
+    $('#pressbar').hidden = true;
+    const titles = { confirm: 'Check your inbox.', waitlist: 'You’re on the waitlist.', sent: 'Check your inbox.' };
+    $('#done-title').textContent = titles[res.mode] || 'Done.';
+    $('#done-body').textContent = res.message;
+    $('#done').hidden = false;
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>

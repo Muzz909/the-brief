@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>The Brief</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #ece5d6; color: #1b1b1b;
+         font-family: Georgia, "Times New Roman", serif; text-align: center; }
+  .mast { font-size: 40px; font-weight: bold; letter-spacing: -1px; margin: 0; }
+  .rule { border-top: 3px double #1b1b1b; width: 220px; margin: 10px auto 18px; }
+  p { color: #6b6256; font-style: italic; }
+  a { color: #7d1d1d; }
+</style>
+</head>
+<body>
+<main>
+  <p class="mast">The Brief</p>
+  <div class="rule"></div>
+  <p id="msg">Taking you to the story…</p>
+</main>
+<script>
+  // Click tracking for The Brief. Parameters ride in the URL fragment (never sent to any server log):
+  //   u = story URL, t = reader token, s = event id, tm = ranker team (v2 / base), sec = section, ed = edition, cb = Apps Script URL
+  (function () {
+    var q = new URLSearchParams(location.hash.slice(1));
+    var u = q.get("u") || "";
+    var safe = /^https?:\/\//i.test(u);
+    var cb = q.get("cb") || "";
+    if (safe && /^https:\/\/script\.google\.com\//.test(cb) && q.get("t")) {
+      var beacon = cb + "?" + new URLSearchParams({ a: "click", t: q.get("t"), s: q.get("s") || "", tm: q.get("tm") || "",
+                                                    sec: q.get("sec") || "", ed: q.get("ed") || "" }).toString();
+      try { fetch(beacon, { mode: "no-cors", keepalive: true }); } catch (e) {}
+    }
+    if (safe) {
+      var host = "";
+      try { host = new URL(u).hostname; } catch (e) {}
+      document.getElementById("msg").innerHTML = "";
+      document.getElementById("msg").append("Taking you to " + host + "… ");
+      var a = document.createElement("a"); a.href = u; a.textContent = "Go now"; a.rel = "noreferrer";
+      document.getElementById("msg").append(a);
+      setTimeout(function () { location.replace(u); }, 350);
+    } else {
+      document.getElementById("msg").textContent = "This link looks broken.";
+    }
+  })();
+</script>
+</body>
+</html>
